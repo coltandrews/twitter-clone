@@ -4,12 +4,22 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
-);
+const prepare = () => {
+  if (process.env.NODE_ENV === 'development') {  // prevents the mock server from working in a deployed, production env
+    const { worker } = require('./mocks/browser.js')
+    return worker.start() // Comment out this return statement to disable the mock api
+  }
+  return Promise.resolve()
+}
+
+prepare().then(() => {
+  const root = ReactDOM.createRoot(document.getElementById('root'))
+  root.render(
+    <React.StrictMode>
+      <App />
+    </React.StrictMode>
+  )
+})
 
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))
