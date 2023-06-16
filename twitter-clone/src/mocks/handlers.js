@@ -462,13 +462,11 @@ export const handlers = [
 
     return res(...resultArray[0]);
   }),
-  rest.get(`${baseURL}/2/users/:id`, (_, res, ctx) => {
-    const resultArray = [
-      [ctx.status(200), ctx.json(getFindUserById200Response())],
-      [ctx.status(NaN), ctx.json(getFindUserByIddefaultResponse())],
-    ];
+  rest.get(`${baseURL}/2/users/:id`, (req, res, ctx) => {
 
-    return res(...resultArray[0]);
+    const { id } = req.params
+
+    return res(ctx.status(200), ctx.json(getFindUserById200Response(id)));
   }),
   rest.get(`${baseURL}/2/users/:id/blocking`, (_, res, ctx) => {
     const resultArray = [
@@ -4988,14 +4986,17 @@ export function getFindMyUserdefaultResponse() {
   };
 }
 
-export function getFindUserById200Response() {
+export function getFindUserById200Response(id) {
+
+  const firstName = faker.person.firstName()
+  const lastName = faker.person.lastName()
   return {
     data: {
-      created_at: "2013-12-14T04:35:55Z",
-      id: "2244994945",
-      name: "Twitter Dev",
+      created_at: faker.date.past({ years: 2 }),
+      id: id,
+      name: `${firstName} ${lastName}`,
       protected: false,
-      username: "TwitterDev",
+      username: faker.internet.userName({firstName, lastName}),
     },
     errors: [
       ...new Array(faker.number.int({ min: 1, max: MAX_ARRAY_LENGTH })).keys(),
