@@ -252,9 +252,10 @@ export const handlers = [
 
     return res(...resultArray[0]);
   }),
-  rest.get(`${baseURL}/2/tweets`, (_, res, ctx) => {
+  rest.get(`${baseURL}/2/tweets`, (req, res, ctx) => {
+    const ids = req.url.search.split('=')[1].split(',')
     const resultArray = [
-      [ctx.status(200), ctx.json(getFindTweetsById200Response())],
+      [ctx.status(200), ctx.json(getFindTweetsById200Response(ids.length))],
       [ctx.status(NaN), ctx.json(getFindTweetsByIddefaultResponse())],
     ];
 
@@ -461,13 +462,11 @@ export const handlers = [
 
     return res(...resultArray[0]);
   }),
-  rest.get(`${baseURL}/2/users/:id`, (_, res, ctx) => {
-    const resultArray = [
-      [ctx.status(200), ctx.json(getFindUserById200Response())],
-      [ctx.status(NaN), ctx.json(getFindUserByIddefaultResponse())],
-    ];
+  rest.get(`${baseURL}/2/users/:id`, (req, res, ctx) => {
 
-    return res(...resultArray[0]);
+    const { id } = req.params
+
+    return res(ctx.status(200), ctx.json(getFindUserById200Response(id)));
   }),
   rest.get(`${baseURL}/2/users/:id/blocking`, (_, res, ctx) => {
     const resultArray = [
@@ -1827,10 +1826,10 @@ export function getListsIdTweets200Response() {
     data: [
       ...new Array(faker.number.int({ min: 1, max: MAX_ARRAY_LENGTH })).keys(),
     ].map((_) => ({
-      author_id: "2244994945",
-      created_at: "Wed Jan 06 18:40:40 +0000 2021",
-      id: "1346889436626259968",
-      text: "Learn how to use the user Tweet timeline and user mention timeline endpoints in the Twitter API v2 to explore Tweet\\u2026 https:\\/\\/t.co\\/56a0vZUx7i",
+      author_id: faker.string.numeric({ length: 10, allowLeadingZeros: true }),
+      created_at: faker.date.past({ years: 2 }),
+      id: faker.string.numeric({ length: 20, allowLeadingZeros: true }),
+      text: faker.lorem.text(),
     })),
     errors: [
       ...new Array(faker.number.int({ min: 1, max: MAX_ARRAY_LENGTH })).keys(),
@@ -2783,15 +2782,15 @@ export function getSpaceTweetsdefaultResponse() {
   };
 }
 
-export function getFindTweetsById200Response() {
+export function getFindTweetsById200Response(num) {
   return {
     data: [
-      ...new Array(faker.number.int({ min: 1, max: MAX_ARRAY_LENGTH })).keys(),
+      ...new Array(num).keys(),
     ].map((_) => ({
-      author_id: "2244994945",
-      created_at: "Wed Jan 06 18:40:40 +0000 2021",
-      id: "1346889436626259968",
-      text: "Learn how to use the user Tweet timeline and user mention timeline endpoints in the Twitter API v2 to explore Tweet\\u2026 https:\\/\\/t.co\\/56a0vZUx7i",
+      author_id: faker.string.numeric({ length: 10, allowLeadingZeros: true }),
+      created_at: faker.date.past({ years: 2 }),
+      id: faker.string.numeric({ length: 20, allowLeadingZeros: true }),
+      text: faker.lorem.text(),
     })),
     errors: [
       ...new Array(faker.number.int({ min: 1, max: MAX_ARRAY_LENGTH })).keys(),
@@ -4987,14 +4986,17 @@ export function getFindMyUserdefaultResponse() {
   };
 }
 
-export function getFindUserById200Response() {
+export function getFindUserById200Response(id) {
+
+  const firstName = faker.person.firstName()
+  const lastName = faker.person.lastName()
   return {
     data: {
-      created_at: "2013-12-14T04:35:55Z",
-      id: "2244994945",
-      name: "Twitter Dev",
+      created_at: faker.date.past({ years: 2 }),
+      id: id,
+      name: `${firstName} ${lastName}`,
       protected: false,
-      username: "TwitterDev",
+      username: faker.internet.userName({firstName, lastName}),
     },
     errors: [
       ...new Array(faker.number.int({ min: 1, max: MAX_ARRAY_LENGTH })).keys(),
